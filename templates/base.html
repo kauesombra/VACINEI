@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Vacinei{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='favicon.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="sr-only" href="#conteudo">Ir para o conteúdo</a>
+  <header class="site-header">
+    <div class="shell">
+      <a class="brand" href="{{ url_for('index') }}">
+        <svg viewBox="0 0 40 40" aria-hidden="true" focusable="false">
+          <g transform="rotate(-6 20 20)" fill="none" stroke="#6a2c91">
+            <rect x="3.5" y="5.5" width="33" height="29" rx="6" stroke-width="3"/>
+            <rect x="8" y="10" width="24" height="20" rx="3" stroke-width="1.5"/>
+          </g>
+          <text x="20" y="27" text-anchor="middle" font-family="Charter, 'Iowan Old Style', Georgia, serif" font-weight="700" font-size="19" fill="#6a2c91">V</text>
+        </svg>
+        Vacinei
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        {% if g.user %}
+          <a href="{{ url_for('history') }}" {% if request.endpoint == 'history' %}aria-current="page"{% endif %}>Histórico</a>
+          <a href="{{ url_for('upload_form') }}" {% if request.endpoint == 'upload_form' %}aria-current="page"{% endif %}>Enviar carteira</a>
+          <a href="{{ url_for('documents') }}" {% if request.endpoint in ('documents', 'review') %}aria-current="page"{% endif %}>Documentos</a>
+          <a href="{{ url_for('account') }}" {% if request.endpoint == 'account' %}aria-current="page"{% endif %}>Conta</a>
+          <form method="post" action="{{ url_for('logout') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit">Sair</button>
+          </form>
+        {% else %}
+          <a href="{{ url_for('login') }}" {% if request.endpoint == 'login' %}aria-current="page"{% endif %}>Entrar</a>
+          <a href="{{ url_for('register') }}" {% if request.endpoint == 'register' %}aria-current="page"{% endif %}>Criar conta</a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="shell" id="conteudo">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul class="flashes">
+          {% for category, message in messages %}
+            <li class="flash {{ category }}" role="{{ 'alert' if category == 'erro' else 'status' }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <div class="shell">
+      <span>Vacinei é um projeto acadêmico de TCC (Unifor). Não substitui a carteira oficial nem o Meu SUS Digital.</span>
+      <a href="{{ url_for('privacy') }}">Privacidade e seus dados</a>
+    </div>
+  </footer>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>

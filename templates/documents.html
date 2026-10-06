@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Documentos – Vacinei{% endblock %}
+{% block content %}
+<h1>Documentos enviados</h1>
+
+{% if not docs %}
+  <div class="empty">
+    <p class="summary">Você ainda não enviou nenhum documento.</p>
+    <a class="btn" href="{{ url_for('upload_form') }}">Enviar carteira</a>
+  </div>
+{% else %}
+  <div class="scroll-x">
+    <table class="data">
+      <caption class="sr-only">Documentos enviados, do mais recente para o mais antigo</caption>
+      <thead>
+        <tr><th scope="col">Arquivo</th><th scope="col">Enviado em</th><th scope="col">Situação</th><th scope="col">Registros</th><th scope="col"><span class="sr-only">Ações</span></th></tr>
+      </thead>
+      <tbody>
+        {% for d in docs %}
+          <tr>
+            <td>{{ d.original_name }}<br><span class="muted small">{{ d.pages }} {{ 'página' if d.pages == 1 else 'páginas' }}</span></td>
+            <td class="num">{{ d.created_at|br_datetime }}</td>
+            <td><span class="status {{ d.status }}">{{ 'Revisado' if d.status == 'revisado' else 'Falta conferir' }}</span></td>
+            <td>{{ d.n_saved }} no histórico<br><span class="muted small">{{ d.n_draft }} lidos</span></td>
+            <td>
+              <div class="btn-row">
+                <a class="btn small {{ 'secondary' if d.status == 'revisado' }}" href="{{ url_for('review', doc_id=d.id) }}">{{ 'Revisar de novo' if d.status == 'revisado' else 'Conferir dados' }}</a>
+                <a class="btn small secondary" href="{{ url_for('original', doc_id=d.id) }}">Baixar</a>
+              </div>
+              <details class="small">
+                <summary>Excluir</summary>
+                <form method="post" action="{{ url_for('document_delete', doc_id=d.id) }}"
+                      data-confirm="Excluir este documento? Essa ação não pode ser desfeita.">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  {% if d.n_saved %}
+                    <label class="check" for="rm_{{ d.id }}">
+                      <input type="checkbox" id="rm_{{ d.id }}" name="remove_records">
+                      <span>Remover também os {{ d.n_saved }} registro(s) salvos a partir dele</span>
+                    </label>
+                  {% endif %}
+                  <button class="btn danger small" type="submit">Excluir documento</button>
+                </form>
+              </details>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

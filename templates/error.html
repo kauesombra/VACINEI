@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% block title %}Algo deu errado – Vacinei{% endblock %}
+{% block content %}
+<div class="error-page">
+  <p class="code">{{ code }}</p>
+  <h1>{{ message }}</h1>
+  <a class="btn" href="{{ url_for('index') }}">Voltar ao início</a>
+</div>
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Vacinei: todas as suas vacinas num só histórico{% endblock %}
+{% block content %}
+<section class="hero">
+  <div>
+    <h1>Todas as suas vacinas num só histórico.</h1>
+    <p class="lead">Fotografe a carteira de vacinação ou envie o PDF de uma clínica. O Vacinei lê as vacinas, as doses e as datas e junta tudo em um lugar só.</p>
+    <div class="btn-row">
+      <a class="btn" href="{{ url_for('register') }}">Criar conta</a>
+      <a class="btn secondary" href="{{ url_for('login') }}">Já tenho conta</a>
+    </div>
+  </div>
+
+  <figure class="demo">
+    <div class="demo-row">
+      <span class="pen">Hepatite B, 1ª dose, 12/03/19</span>
+      <ul class="stamps"><li class="stamp"><span class="dose">1ª dose</span><time datetime="2019-03-12">12/03/2019</time></li></ul>
+    </div>
+    <div class="demo-row">
+      <span class="pen">Tríplice viral, 2a dose, 20/3/2020</span>
+      <ul class="stamps"><li class="stamp"><span class="dose">2ª dose</span><time datetime="2020-03-20">20/03/2020</time></li></ul>
+    </div>
+    <div class="demo-row">
+      <span class="pen">Febre amarela, D.U., 05/04/21</span>
+      <ul class="stamps"><li class="stamp"><span class="dose">Dose única</span><time datetime="2021-04-05">05/04/2021</time></li></ul>
+    </div>
+    <figcaption>Exemplo: linhas escritas à mão (esquerda) e como ficam no histórico (direita).</figcaption>
+  </figure>
+</section>
+
+<ol class="steps">
+  <li>
+    <h3>Envie</h3>
+    <p>Tire uma foto da carteira ou escolha um PDF de clínica ou de campanha de vacinação.</p>
+  </li>
+  <li>
+    <h3>Confira</h3>
+    <p>O texto é lido automaticamente. Você corrige o que o leitor errou antes de salvar.</p>
+  </li>
+  <li>
+    <h3>Consulte</h3>
+    <p>As doses ficam juntas, sem repetições, prontas para mostrar, imprimir ou exportar.</p>
+  </li>
+</ol>
+{% endblock %}

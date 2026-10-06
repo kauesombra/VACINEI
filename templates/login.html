@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Entrar – Vacinei{% endblock %}
+{% block content %}
+<h1>Entrar</h1>
+<form method="post" class="form-narrow">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <div class="field">
+    <label for="email">E-mail</label>
+    <input type="email" id="email" name="email" value="{{ form.get('email', '') }}" autocomplete="email" required autofocus>
+  </div>
+  <div class="field">
+    <label for="password">Senha</label>
+    <input type="password" id="password" name="password" autocomplete="current-password" required>
+  </div>
+  <div class="btn-row">
+    <button class="btn" type="submit">Entrar</button>
+    <a href="{{ url_for('register') }}">Criar conta</a>
+  </div>
+</form>
+{% endblock %}

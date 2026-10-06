@@ -1,0 +1,7 @@
+Flask>=3.0
+opencv-python-headless>=4.9
+numpy>=1.26
+pytesseract>=0.3.10
+pdf2image>=1.17
+Pillow>=10.0
+reportlab>=4.0

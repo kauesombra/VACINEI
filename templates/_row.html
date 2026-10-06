@@ -1,0 +1,49 @@
+{% macro review_row(row) %}
+{% set rid = row.rid %}
+{% set low = row.confidence is not none and (row.confidence < 0.75 or row.flags) %}
+<div class="row {% if row.errors %}invalid{% elif low %}confira{% elif row.confidence is not none %}ok{% endif %}">
+  <input type="hidden" name="rid" value="{{ rid }}">
+  <input type="hidden" name="raw_{{ rid }}" value="{{ row.raw }}">
+  {% if row.confidence is not none %}<input type="hidden" name="conf_{{ rid }}" value="{{ row.confidence }}">{% endif %}
+  {% if row.page %}<input type="hidden" name="page_{{ rid }}" value="{{ row.page }}">{% endif %}
+  <div class="row-grid">
+    <div class="field">
+      <label for="vaccine_{{ rid }}">Vacina</label>
+      <select id="vaccine_{{ rid }}" name="vaccine_{{ rid }}">
+        <option value="">Escolha a vacina</option>
+        {% for c in catalog %}
+          <option value="{{ c.key }}" {% if row.vaccine == c.key %}selected{% endif %}>{{ c.name }}</option>
+        {% endfor %}
+        <option value="custom" {% if row.vaccine == 'custom' %}selected{% endif %}>Outra vacina (digitar)</option>
+      </select>
+      <div class="custom" {% if row.vaccine != 'custom' %}hidden{% endif %}>
+        <label class="sr-only" for="custom_{{ rid }}">Nome da vacina</label>
+        <input type="text" id="custom_{{ rid }}" name="custom_{{ rid }}" value="{{ row.custom }}" maxlength="80" placeholder="Nome da vacina">
+      </div>
+    </div>
+    <div class="field">
+      <label for="dose_{{ rid }}">Dose</label>
+      <select id="dose_{{ rid }}" name="dose_{{ rid }}">
+        {% for key, label in dose_options %}
+          <option value="{{ key }}" {% if row.dose == key %}selected{% endif %}>{{ label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="date_{{ rid }}">Data de aplicação</label>
+      <input type="date" id="date_{{ rid }}" name="date_{{ rid }}" value="{{ row.date }}" min="1900-01-01" max="{{ today_iso }}">
+    </div>
+  </div>
+  <div class="row-foot">
+    <label class="check" for="include_{{ rid }}">
+      <input type="checkbox" id="include_{{ rid }}" name="include_{{ rid }}" {% if row.include %}checked{% endif %}>
+      <span>Salvar este registro</span>
+    </label>
+    <button type="button" class="linkbtn" data-remove-row>Descartar linha</button>
+  </div>
+  {% if row.raw %}
+    <p class="read">{% if low %}<span class="badge">Confira</span>{% endif %}Texto lido: “{{ row.raw }}”</p>
+  {% endif %}
+  {% for e in row.errors %}<p class="field-error" role="alert">{{ e }}</p>{% endfor %}
+</div>
+{% endmacro %}

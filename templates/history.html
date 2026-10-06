@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+{% block title %}Histórico vacinal – Vacinei{% endblock %}
+{% block content %}
+<h1>Seu histórico vacinal</h1>
+<p class="print-only">{{ g.user.name }}, emitido em {{ today_iso|br_date }}.</p>
+
+{% if h.total_doses == 0 %}
+  <div class="empty">
+    <p class="summary">Seu histórico ainda está vazio.</p>
+    <p>Envie uma foto ou um PDF da sua carteira de vacinação. Depois de conferir os dados, as doses aparecem aqui.</p>
+    <a class="btn" href="{{ url_for('upload_form') }}">Enviar carteira</a>
+    {% if n_docs %}<p class="hint spaced">Você já enviou {{ n_docs }} documento(s). <a href="{{ url_for('documents') }}">Revise os dados lidos</a> para incluí-los aqui.</p>{% endif %}
+  </div>
+{% else %}
+  <p class="summary">
+    Você tem <strong>{{ h.total_doses }} {{ 'dose registrada' if h.total_doses == 1 else 'doses registradas' }}</strong>
+    de {{ h.total_vaccines }} {{ 'vacina' if h.total_vaccines == 1 else 'vacinas' }}.
+    A mais recente foi em {{ h.last_date|br_date }}.
+  </p>
+
+  {% if h.n_conflicts %}
+    <p class="notice no-print">Algumas doses aparecem com datas diferentes (em âmbar). Confira qual data está certa e remova a outra.</p>
+  {% endif %}
+
+  <div class="toolbar no-print">
+    <div class="segmented" role="group" aria-label="Forma de exibição">
+      <a href="{{ url_for('history') }}" {% if view == 'groups' %}aria-current="true"{% endif %}>Por vacina</a>
+      <a href="{{ url_for('history', v='timeline') }}" {% if view == 'timeline' %}aria-current="true"{% endif %}>Cronológico</a>
+    </div>
+    <div class="filter">
+      <label class="sr-only" for="filter">Filtrar por vacina</label>
+      <input type="text" id="filter" placeholder="Filtrar por vacina" autocomplete="off">
+    </div>
+    <div class="btn-row">
+      <a class="btn secondary small" href="{{ url_for('upload_form') }}">Enviar carteira</a>
+      <a class="btn secondary small" href="{{ url_for('history_csv') }}">Exportar planilha (CSV)</a>
+      <a class="btn secondary small" href="{{ url_for('history_fhir') }}" title="Formato HL7 FHIR (R4) para interoperabilidade">Exportar FHIR</a>
+      <button type="button" class="btn secondary small" data-print>Imprimir</button>
+    </div>
+  </div>
+
+  {% if view == 'groups' %}
+    <div class="book">
+      {% for grp in h.groups %}
+        <section class="entry" data-search="{{ grp.name }}">
+          <h2>{{ grp.name }}</h2>
+          <ul class="stamps">
+            {% for d in grp.doses %}
+              <li class="stamp{% if d.conflict %} conflict{% endif %}{% if not d.dose_key %} incomplete{% endif %}">
+                <span class="dose">{{ d.dose_label }}</span>
+                <time datetime="{{ d.date }}">{{ d.date|br_date }}</time>
+                <form class="remove" method="post" action="{{ url_for('vaccination_delete', vid=d.id) }}"
+                      data-confirm="Remover {{ d.dose_label }} de {{ grp.name }} ({{ d.date|br_date }}) do histórico?">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" aria-label="Remover {{ d.dose_label }} de {{ grp.name }} em {{ d.date|br_date }}">×</button>
+                </form>
+              </li>
+            {% endfor %}
+          </ul>
+          {% if grp.doses|selectattr('dose_key', 'equalto', '')|list %}
+            <p class="notice no-print">Falta identificar a dose (carimbo tracejado). Em Documentos, use “Revisar de novo” para completar.</p>
+          {% endif %}
+          {% if grp.conflicts %}
+            <p class="notice no-print">
+              {% for k in grp.conflicts %}{{ dose_label(k) }}{% if not loop.last %}, {% endif %}{% endfor %}
+              {{ 'aparece' if grp.conflicts|length == 1 else 'aparecem' }} com mais de uma data. Pode ser um erro de leitura ou uma dose repetida.
+            </p>
+          {% endif %}
+        </section>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="scroll-x">
+      <table class="data">
+        <caption class="sr-only">Doses registradas, da mais recente para a mais antiga</caption>
+        <thead><tr><th scope="col">Data</th><th scope="col">Vacina</th><th scope="col">Dose</th><th scope="col"><span class="sr-only">Ações</span></th></tr></thead>
+        <tbody>
+          {% for d in h.timeline %}
+            <tr data-search="{{ d.vaccine_name }}">
+              <td class="num">{{ d.date|br_date }}</td>
+              <td>{{ d.vaccine_name }}</td>
+              <td>{{ d.dose_label }}{% if d.conflict %} <span class="badge">Confira</span>{% endif %}</td>
+              <td>
+                <form method="post" action="{{ url_for('vaccination_delete', vid=d.id, v='timeline') }}"
+                      data-confirm="Remover {{ d.dose_label }} de {{ d.vaccine_name }} ({{ d.date|br_date }}) do histórico?">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button class="linkbtn" type="submit">Remover</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% endif %}
+{% endif %}
+
+<details class="add no-print">
+  <summary>Adicionar uma dose manualmente</summary>
+  <form method="post" action="{{ url_for('vaccination_add') }}">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="add-vaccine">Vacina</label>
+      <select id="add-vaccine" name="vaccine" required>
+        <option value="">Escolha a vacina</option>
+        {% for c in catalog %}<option value="{{ c.key }}">{{ c.name }}</option>{% endfor %}
+        <option value="custom">Outra vacina (digitar)</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="add-custom">Nome, se for outra vacina</label>
+      <input type="text" id="add-custom" name="custom" maxlength="80">
+    </div>
+    <div class="field">
+      <label for="add-dose">Dose</label>
+      <select id="add-dose" name="dose">
+        {% for key, label in dose_options %}<option value="{{ key }}">{{ label }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="field">
+      <label for="add-date">Data de aplicação</label>
+      <input type="date" id="add-date" name="date" min="1900-01-01" max="{{ today_iso }}" required>
+    </div>
+    <button class="btn" type="submit">Adicionar ao histórico</button>
+  </form>
+</details>
+{% endblock %}

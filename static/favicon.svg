@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40">
+  <rect width="40" height="40" rx="9" fill="#f4f7f5"/>
+  <g transform="rotate(-6 20 20)" fill="none" stroke="#6a2c91">
+    <rect x="4.5" y="6.5" width="31" height="27" rx="6" stroke-width="3"/>
+    <rect x="9" y="11" width="22" height="18" rx="3" stroke-width="1.5"/>
+  </g>
+  <text x="20" y="27" text-anchor="middle" font-family="Charter, Georgia, serif" font-weight="700" font-size="18" fill="#6a2c91">V</text>
+</svg>

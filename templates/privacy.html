@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Privacidade – Vacinei{% endblock %}
+{% block content %}
+<h1>Privacidade e seus dados</h1>
+<div class="prose">
+  <p>Dados de vacinação são dados de saúde, que a Lei Geral de Proteção de Dados (LGPD) trata como sensíveis. Esta página explica, em linguagem simples, o que o Vacinei guarda e o que você pode fazer com isso.</p>
+
+  <p>O Vacinei é um protótipo acadêmico, desenvolvido como trabalho de conclusão de curso. Ele foi pensado a partir da LGPD, mas ainda não passou por auditoria de segurança. Não use para guardar o único exemplar de um documento.</p>
+
+  <h2>O que é guardado</h2>
+  <p>Seu nome, e-mail e uma versão protegida da senha (nunca a senha em si). Os arquivos que você envia e uma cópia reduzida de cada página. O texto lido pelo OCR. E os registros que você confirmou: vacina, dose e data.</p>
+
+  <h2>Para que serve</h2>
+  <p>Apenas para montar o seu histórico vacinal e mostrá-lo a você. Os dados não são vendidos, não são usados para publicidade e não são enviados a serviços de terceiros: a leitura das imagens acontece no próprio servidor do sistema.</p>
+
+  <h2>Quem enxerga</h2>
+  <p>Só você, logado na sua conta. Cada documento e cada registro só é entregue ao dono.</p>
+
+  <h2>O que você pode fazer</h2>
+  <p>Baixar seus registros em planilha, corrigir ou remover qualquer dose do histórico, excluir documentos enviados e excluir a conta inteira. Ao excluir a conta, os dados e as imagens são apagados de forma definitiva, na página <a href="{{ url_for('account') }}">Conta</a>.</p>
+
+  <h2>Confira sempre</h2>
+  <p>A leitura automática pode errar, e o histórico aqui não tem valor de comprovante oficial. Para exigências legais, use a carteira original ou o Meu SUS Digital.</p>
+</div>
+{% endblock %}

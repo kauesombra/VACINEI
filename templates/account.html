@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Conta – Vacinei{% endblock %}
+{% block content %}
+<h1>Sua conta</h1>
+<p class="prose"><strong>{{ g.user.name }}</strong><br><span class="muted">{{ g.user.email }}</span></p>
+<p class="prose">Você tem {{ counts.vaccinations }} {{ 'registro' if counts.vaccinations == 1 else 'registros' }} no histórico e {{ counts.documents }} {{ 'documento enviado' if counts.documents == 1 else 'documentos enviados' }}.</p>
+<div class="btn-row">
+  <a class="btn secondary" href="{{ url_for('history_csv') }}">Baixar meus dados (CSV)</a>
+  <a class="btn secondary" href="{{ url_for('privacy') }}">Privacidade e seus dados</a>
+</div>
+
+<section class="danger-zone">
+  <h2>Excluir minha conta</h2>
+  <p>Isso apaga a conta, todos os registros do histórico, os documentos enviados e as imagens guardadas. Não dá para desfazer.</p>
+  <form method="post" action="{{ url_for('account_delete') }}" data-confirm="Excluir a conta e todos os dados de forma definitiva?">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="field">
+      <label for="pw">Digite sua senha para confirmar</label>
+      <input type="password" id="pw" name="password" autocomplete="current-password" required>
+    </div>
+    <button class="btn danger" type="submit">Excluir conta e dados</button>
+  </form>
+</section>
+{% endblock %}

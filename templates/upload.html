@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Enviar carteira – Vacinei{% endblock %}
+{% block content %}
+<h1>Enviar carteira de vacinação</h1>
+<p class="prose">Escolha fotos ou PDFs. Depois da leitura, você confere os dados antes de eles entrarem no seu histórico.</p>
+
+<form id="upload-form" method="post" enctype="multipart/form-data" action="{{ url_for('upload') }}">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+  <label class="dropzone">
+    <strong>Escolha arquivos ou arraste até aqui</strong>
+    <span class="muted">Foto (JPG, PNG, WEBP) ou PDF, até 15 MB cada. No celular, você pode tirar a foto na hora.</span>
+    <input type="file" name="arquivo" multiple accept="image/*,application/pdf,.pdf">
+  </label>
+  <ul class="file-list" id="file-list" aria-live="polite"></ul>
+  <div class="btn-row spaced">
+    <button class="btn" type="submit" disabled>Enviar carteira</button>
+  </div>
+  <p class="working" role="status">Lendo o documento. Isso pode levar até um minuto, não feche a página.</p>
+</form>
+
+<ul class="tips">
+  <li>Fotografe com boa luz, de frente e sem sombra sobre o texto.</li>
+  <li>Até {{ max_files }} arquivos por envio. PDFs são lidos até a página {{ max_pages }}.</li>
+  <li>Letra de mão é a parte mais difícil de ler. Confira sempre os dados antes de salvar.</li>
+</ul>
+{% endblock %}

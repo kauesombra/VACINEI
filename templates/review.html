@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% from "_row.html" import review_row with context %}
+{% set blank = {"rid": "__RID__", "vaccine": "", "custom": "", "dose": "", "date": "", "include": True,
+                "raw": "", "confidence": None, "flags": [], "page": None, "errors": []} %}
+{% block title %}Conferir dados – Vacinei{% endblock %}
+{% block content %}
+<h1>Confira o que foi lido</h1>
+<p class="prose">A leitura automática pode errar, principalmente em letra de mão. Compare com o documento, corrija o que for preciso e salve. Só o que estiver marcado entra no seu histórico.</p>
+
+{% for w in warnings %}<p class="notice">{{ w }}</p>{% endfor %}
+
+<div class="review">
+  <details class="doc-view" open>
+    <summary>Documento enviado: {{ doc.original_name }}</summary>
+    <p class="hint">Clique na imagem para abrir em tamanho maior.</p>
+    <div class="pages">
+      {% for p in range(1, doc.pages + 1) %}
+        <a href="{{ url_for('preview', doc_id=doc.id, page=p) }}" target="_blank" rel="noopener">
+          <img src="{{ url_for('preview', doc_id=doc.id, page=p) }}" alt="Página {{ p }} do documento enviado" loading="lazy">
+        </a>
+      {% endfor %}
+    </div>
+  </details>
+
+  <form method="post" id="review-form">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <div class="rows" id="rows" data-next-rid="{{ next_rid }}">
+      {% for row in rows %}{{ review_row(row) }}{% endfor %}
+    </div>
+    {% if not rows %}
+      <p class="notice">Nenhum registro foi reconhecido. Use “Adicionar linha” para digitar o que está no documento.</p>
+    {% endif %}
+    <template id="row-template">{{ review_row(blank) }}</template>
+
+    <div class="actions-bar">
+      <button type="button" class="btn secondary" id="add-row">Adicionar linha</button>
+      <div class="btn-row">
+        <a class="btn secondary" href="{{ url_for('documents') }}">Revisar depois</a>
+        <button type="submit" class="btn">Salvar no histórico</button>
+      </div>
+    </div>
+  </form>
+</div>
+{% endblock %}
